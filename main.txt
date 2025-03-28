@@ -1,0 +1,31 @@
+import machine
+import time
+
+button = machine.Pin(12, machine.Pin.IN, machine.Pin.PULL_UP)
+pwm = machine.PWM(machine.Pin(33))
+pwm.freq(100000)
+indic = machine.Pin(15, machine.Pin.OUT)
+sensor = machine.ADC(machine.Pin(39))
+starttime = time.time()
+
+while button.value():
+    pwm.duty(85)
+
+    if (time.time()-starttime) %2 == 0:
+        indic.on()
+        time.sleep(0.5)
+        indic.off()
+
+    if (time.time()-starttime) %10 == 0:
+        f = open('test1.txt', 'a')
+        f.write('{} {}\n'.format(time.time()-starttime,sensor.read_uv()))
+        print('{} {}\n'.format(time.time()-starttime,sensor.read_uv()))
+        f.close()
+        time.sleep(1)
+
+pwm.duty(0)
+indic.off()
+f = open('test1.txt', 'a')
+f.write('End of experiment!\n\n')
+f.close()
+
